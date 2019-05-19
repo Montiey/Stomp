@@ -1,0 +1,76 @@
+*{
+	margin: 0px;
+	padding: 0px;
+	color: #000;
+	font-family: Roboto Mono;
+}
+
+html{
+	height: 100%;
+}
+
+body{
+	height: 100%;
+	background-color: #444;
+	user-select: none;
+}
+
+#container{
+}
+	#canvasContainer{
+		margin: 10px;
+	}
+		#canvas{
+			border: 1px solid #fff;
+		}
+
+
+
+
+
+
+.eCol{
+	display: flex;
+	flex-direction: column;
+}
+
+.eRow{
+	display: flex;
+	flex-direction: row;
+}
+
+.eBetween{
+	justify-content: space-between;
+}
+
+.eAround{
+	justify-content: space-around;
+}
+
+.eCenter{
+	justify-content: center;
+}
+
+.eAlign{
+	align-items: center;
+}
+
+.eStart{
+	justify-content: flex-start;
+}
+
+.eEnd{
+	justify-content: flex-end;
+}
+
+.eGrow{
+	flex-grow: 999;
+}
+
+.eWide{
+	width: 100%;
+}
+
+.eTall{
+	height: 100%;
+}
