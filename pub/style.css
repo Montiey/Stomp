@@ -1,7 +1,7 @@
 *{
 	margin: 0px;
 	padding: 0px;
-	color: #000;
+	color: #FFF;
 	font-family: Roboto Mono;
 }
 
@@ -73,4 +73,8 @@ body{
 
 .eTall{
 	height: 100%;
+}
+
+.eTextCenter{
+	text-align: center;
 }

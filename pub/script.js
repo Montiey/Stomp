@@ -1,23 +1,29 @@
-const gravity = new Two.Vector(0, .5);
+const gravity = new Two.Vector(0, .3);
 
 const pWidth = 50;
 const pHeight = 50;
 
-const pJumpFactor = 30;
+const pJumpSpeed = 12;
 
-const pHAcc = 2;
+const pHAcc = .75;
 
-const pMaxHSpeed = 10;
+const pMaxHSpeed = 8;
 
-const pJumps = 2;
+const pJumps = 1;
+
+const pColor = "#0ef"
+const pSafeColor = "#ccc"
+const eColor = "#f00"
+
+var dataInterval = 20;	//Millis per packet
 
 var players = [	//Players that are not the user
 ];
-
-const server = "http://localhost";
-const port = 8787;
+var wins = 0;
+var losses = 0;
+const port = 8002;
 var socketID = "";
-var sock = io.connect(server + ":" + port);
+var sock = io.connect(window.location.hostname);
 sock.on("selfID", function(data){
 	console.log("Received id: " + data);
 	socketID = data;
@@ -32,7 +38,7 @@ function sendUserData(){
 	});
 }
 
-setInterval(sendUserData, 30);
+setInterval(sendUserData, dataInterval);
 
 ////////
 
@@ -63,15 +69,7 @@ function Player(){
 	this.group = two.makeGroup(this.elem);
 
 	this.elem.noStroke();
-
-	this.pos = new Two.Vector(two.width/2, two.height/2);
-	this.vel = new Two.Vector(0, 0);
-	this.acc = new Two.Vector(0, 0);	//internals only
-
-	this.jumps = pJumps;
-	this.movingRight = false;
-	this.movingLeft = false;
-
+	this.elem.fill = eColor;
 	this.userPhysics = function(){
 		if(this.movingRight && !this.movingLeft){
 			this.acc.x = pHAcc;
@@ -108,10 +106,12 @@ function Player(){
 			this.pos.y = pHeight/2;
 		}
 		if(this.pos.x - pWidth/2 < 0){
+			this.jumps = pJumps;
 			this.vel.x = 0;
 			this.pos.x = pWidth/2;
 		}
 		if(this.pos.x + pWidth/2 > two.width){
+			this.jumps = pJumps;
 			this.vel.x = 0;
 			this.pos.x = two.width - pWidth/2;
 		}
@@ -120,14 +120,25 @@ function Player(){
 	this.jump = function(){
 		if(!this.jumps) return;
 		this.jumps--;
-		this.vel.y = -pJumpFactor * gravity.y;
+		this.vel.y = -pJumpSpeed;
 	}
 
 	this.destroy = function(){
 		two.remove(this.group);
 		var i = players.indexOf(this);
-		players.splice(i, i+1);
+		players.splice(i, 1);
 	}
+
+	this.reset = function(){
+		this.pos = new Two.Vector(two.width/2, two.height/2);
+		this.vel = new Two.Vector(0, 0);
+		this.acc = new Two.Vector(0, 0);	//internals only
+
+		this.jumps = pJumps;
+		this.movingRight = false;
+		this.movingLeft = false;
+	}
+	this.reset();
 
 	players.push(this);
 }
@@ -151,14 +162,37 @@ sock.on("playerData", function(data){
 	}
 });
 
+sock.on("win", function(data){
+	players[0].elem.fill = pSafeColor;
+	if(data.winnerID === socketID){
+		wins++;
+		console.log("You win");
+	} else if(data.loserID === socketID){
+		losses++;
+		console.log("You lose, resetting");
+		players[0].reset();
+	}
+	document.getElementById("wins").textContent = wins + " wins " + losses + " losses";
+
+});
+
+sock.on("begin", function(data){
+	players[0].elem.fill = pColor;
+});
+
+sock.on("refresh", function(data){
+	console.log("Refreshing...");
+	location.reload();
+});
+
 ////////
 
 document.addEventListener("keydown", function(e){
 	var valid = false;
-	if(e.key == "a" && !e.repeat){
+	if((e.key == "a" || e.key == "A") && !e.repeat){
 		players[0].movingLeft = true;
 	}
-	if(e.key == "d" && !e.repeat){
+	if((e.key == "d" || e.key == "D") && !e.repeat){
 		players[0].movingRight = true;
 	}
 	if(e.key == " " && !e.repeat){
@@ -167,15 +201,15 @@ document.addEventListener("keydown", function(e){
 });
 
 document.addEventListener("keyup", function(e){
-	if(e.key == "a" && !e.repeat){
+	if((e.key == "a" || e.key == "A") && !e.repeat){
 		players[0].movingLeft = false;
 	}
 
-	if(e.key == "d" && !e.repeat){
+	if((e.key == "d" || e.key == "D") && !e.repeat){
 		players[0].movingRight = false;
 	}
 });
 
 ////////
 
-new Player().elem.fill = "#ff0";
+new Player().elem.fill = pColor;

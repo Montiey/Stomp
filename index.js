@@ -2,7 +2,7 @@ const express = require("express");
 const socket = require("socket.io");
 var app = express();
 const staticDir = "./pub/";
-const port = 8787;
+const port = 8002;
 
 var players = [];
 function Player(id){
@@ -13,15 +13,18 @@ function Player(id){
 	this.id = id;
 }
 
+var lastWinTime = Date.now();
+var beginDelay = 1000;
+
 var server = app.listen(port, function(){
-	console.log("Stop server started on port " + port);
+	console.log("Stomp server started on port " + port);
 });
 
-var sock = socket(server);
+var sockServer = socket(server);
 
 app.use(express.static(staticDir));
 
-sock.on("connection", function(socket){
+sockServer.on("connection", function(socket){
 	console.log("Got socket " + socket.id);
 	socket.emit("selfID", socket.id);
 	players.push(new Player(socket.id));
@@ -39,6 +42,33 @@ sock.on("connection", function(socket){
 			}
 		}
 		socket.emit("playerData", players);
+		
+		//Check for wins
+		if(Date.now() - lastWinTime > beginDelay)
+		outer: for(var test of players){	//TODO: more efficent test
+			for(var subj of players){
+				if(Math.abs(test.xPos - subj.xPos) < 50){
+					if(Math.abs(test.yPos - subj.yPos) < 50){
+						if(test.yPos == subj.yPos){
+						} else{
+							lastWinTime = Date.now();
+							var winner = (test.yPos > subj.yPos ? subj.id : test.id);
+							var loser = winner == test.id ? subj.id : test.id;
+							console.log("Loser: " + loser + " winner: " + winner);
+							sockServer.emit("win", {
+								winnerID: winner,
+								loserID: loser
+								
+							});
+							setTimeout(function(){
+								sockServer.emit("begin", {});
+							}, beginDelay);
+							break outer;
+						}
+					}
+				}
+			}
+		}
 	});
 
 	socket.on("disconnect", function(){
@@ -47,5 +77,9 @@ sock.on("connection", function(socket){
 				players.splice(i, i+1);
 			}
 		}
-	})
+	});
+});
+
+process.on("SIGINT", function(){
+	sockServer.emit("refresh", {});
 });

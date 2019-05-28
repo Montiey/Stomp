@@ -1,0 +1,36 @@
+{
+	"templateTags": [
+		{
+			"tag": "{{URL}}",
+			"value": "/stomp/"
+		},
+		{
+			"tag": "{{BANNERCOLOR}}",
+			"value": "#0ef"
+		},
+		{
+			"tag": "{{BANNERTEXTCOLOR}}",
+			"value": "#000"
+		},
+		{
+			"tag": "{{BANNERTEXT}}",
+			"value": "Stomp"
+		},
+		{
+			"tag": "{{BODYCOLOR}}",
+			"value": "#444"
+		},
+		{
+			"tag": "{{BODYTEXTCOLOR}}",
+			"value": "#fff"
+		},
+		{
+			"tag": "{{BODYTEXT}}",
+			"value": "Multiplayer jumping game"
+		},
+		{
+			"tag": "{{REPOSITORYURL}}",
+			"value": "http://github.com/Montiey/Stomp"
+		}
+	]
+}
