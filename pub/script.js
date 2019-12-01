@@ -1,19 +1,19 @@
-const gravity = new Two.Vector(0, .3);
+var gravity = new Two.Vector(0, .3);
 
-const pWidth = 50;
-const pHeight = 50;
+var  pWidth = 50;
+var  pHeight = 50;
 
-const pJumpSpeed = 12;
+var pJumpSpeed = 12;
 
-const pHAcc = .75;
+var pHAcc = .75;
 
-const pMaxHSpeed = 8;
+var pMaxHSpeed = 8;
 
-const pJumps = 1;
+var pJumps = 1;
 
-const pColor = "#0ef"
-const pSafeColor = "#ccc"
-const eColor = "#f00"
+var pColor = "#0ef"
+var pSafeColor = "#ccc"
+var eColor = "#f00"
 
 var dataInterval = 20;	//Millis per packet
 
@@ -21,7 +21,7 @@ var players = [	//Players that are not the user
 ];
 var wins = 0;
 var losses = 0;
-const port = 8002;
+var port = 8002;
 var socketID = "";
 var sock = io.connect(window.location.hostname);
 sock.on("selfID", function(data){

@@ -18,11 +18,11 @@
 		},
 		{
 			"tag": "{{BODYCOLOR}}",
-			"value": "#444"
+			"value": "#eee"
 		},
 		{
 			"tag": "{{BODYTEXTCOLOR}}",
-			"value": "#fff"
+			"value": "#000"
 		},
 		{
 			"tag": "{{BODYTEXT}}",

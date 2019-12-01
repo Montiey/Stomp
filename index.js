@@ -11,10 +11,23 @@ function Player(id){
 	this.xVel = 0;
 	this.yVel = 0;
 	this.id = id;
+	this.lastSeenTime = Date.now();
 }
 
 var lastWinTime = Date.now();
 var beginDelay = 1000;
+var playerTimeOut = 2000;
+
+
+function removePlayer(id){
+	for(var i = 0; i < players.length; i++){
+		if(players[i].id === id){
+			players.splice(i, i+1);
+		}
+	}
+}
+
+
 
 var server = app.listen(port, function(){
 	console.log("Stomp server started on port " + port);
@@ -39,6 +52,8 @@ sockServer.on("connection", function(socket){
 				p.yPos = data.yPos;
 				p.xVel = data.xVel;
 				p.yVel = data.yVel;
+				p.lastSeenTime = Date.now();
+				break;
 			}
 		}
 		socket.emit("playerData", players);
@@ -72,14 +87,24 @@ sockServer.on("connection", function(socket){
 	});
 
 	socket.on("disconnect", function(){
-		for(var i = 0; i < players.length; i++){
-			if(players[i].id === socket.id){
-				players.splice(i, i+1);
-			}
-		}
+		console.log("Player soft disconnect");
+		removePlayer(socket.id);
 	});
 });
 
 process.on("SIGINT", function(){
 	sockServer.emit("refresh", {});
 });
+
+setInterval(function(){
+	var now = Date.now();
+	//console.log(now);
+	for(var p of players){
+		//console.log(p.id + " " + (now - p.lastSeenTime));
+		if(now - p.lastSeenTime > playerTimeOut){
+			console.log("Player hard disconnect");
+			removePlayer(p.id);
+			break;
+		}
+	}
+}, 500);	//TODO: Quicker check?
